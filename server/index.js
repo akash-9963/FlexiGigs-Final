@@ -19,6 +19,7 @@ app.use(
     origin: "https://flexigigs.vercel.app",
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
 
