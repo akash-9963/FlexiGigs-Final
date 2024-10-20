@@ -16,7 +16,7 @@ const port = process.env.PORT;
 // CORS configuration
 app.use(
   cors({
-    origin: [process.env.ORIGIN],
+    origin: "https://flexigigs.vercel.app",
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
   })
