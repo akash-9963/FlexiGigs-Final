@@ -12,23 +12,8 @@ import multer from "multer";
 const authRoutes = Router();
 const upload = multer({ dest: "uploads/profiles/" });
 
-// Handle preflight requests for CORS
-authRoutes.options("/signup", (req, res) => {
-  res.sendStatus(200);
-});
-authRoutes.options("/login", (req, res) => {
-  res.sendStatus(200);
-});
-authRoutes.options("/get-user-info", (req, res) => {
-  res.sendStatus(200);
-});
-authRoutes.options("/set-user-info", (req, res) => {
-  res.sendStatus(200);
-});
-authRoutes.options("/set-user-image", (req, res) => {
-  res.sendStatus(200);
-});
-authRoutes.options("/api/delete-user", (req, res) => {
+// Handle preflight requests
+authRoutes.options("*", (req, res) => {
   res.sendStatus(200);
 });
 
@@ -37,8 +22,6 @@ authRoutes.post("/signup", signup);
 authRoutes.post("/login", login);
 authRoutes.post("/get-user-info", verifyToken, getUserInfo);
 authRoutes.post("/set-user-info", verifyToken, setUserInfo);
-
-// Delete User Endpoint
 authRoutes.delete("/api/delete-user", verifyToken, async (req, res) => {
   const userId = req.user.id; // Assuming you have user authentication in place
 

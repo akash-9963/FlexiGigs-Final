@@ -14,14 +14,12 @@ const app = express();
 const port = process.env.PORT;
 
 // CORS configuration
-app.use(
-  cors({
-    origin: "https://flexigigs.vercel.app",
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-    credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  })
-);
+app.use(cors({
+  origin: 'https://flexigigs.vercel.app', // Your frontend origin
+  credentials: true, // Allow credentials if needed
+  methods: ['GET', 'POST', 'OPTIONS', 'DELETE'], // Allowed methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+}));
 
 // Serve static files from the uploads directory
 app.use("/uploads", express.static("uploads"));
