@@ -21,7 +21,8 @@
   },
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "postinstall":"chmod +x node_modules/.bin/prisma && prisma generate"
   },
   "author": "",
   "license": "ISC",
