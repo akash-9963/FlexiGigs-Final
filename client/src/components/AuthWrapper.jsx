@@ -27,15 +27,16 @@ function AuthWrapper({ type }) {
   };
 
   const isValidEmail = (email) => {
+    // Basic email validation regex
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
   };
 
   const handleClick = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent default form submission
 
     const { email, password } = values;
-    setError("");
+    setError(""); // Reset error state
 
     // Validate input
     if (!email || !password) {
@@ -47,30 +48,29 @@ function AuthWrapper({ type }) {
       return;
     }
 
-    setLoading(true);
+    setLoading(true); // Set loading state
     try {
-      const { data } = await axios.post(
+      const {
+        data: { user, jwt },
+      } = await axios.post(
         type === "login" ? LOGIN_ROUTE : SIGNUP_ROUTE,
         { email, password },
         { withCredentials: true }
       );
 
-      // Assuming the backend returns the JWT token directly
-      const token = data.jwt;
-      if (token) {
-        setCookies("jwt", token, { path: '/', secure: true, sameSite: 'Strict' });
-      }
+      setCookies("jwt", { jwt }); // Set cookie
       dispatch({ type: reducerCases.CLOSE_AUTH_MODAL });
 
-      if (data.user) {
-        dispatch({ type: reducerCases.SET_USER, userInfo: data.user });
+      if (user) {
+        dispatch({ type: reducerCases.SET_USER, userInfo: user });
         window.location.reload();
       }
     } catch (err) {
+      // Set specific error messages based on the response from the server
       const message = err.response?.data?.message || "An error occurred. Please try again.";
       setError(message);
     } finally {
-      setLoading(false);
+      setLoading(false); // Reset loading state
     }
   };
 
@@ -92,27 +92,31 @@ function AuthWrapper({ type }) {
             <h3 className="text-2xl font-semibold text-slate-700">
               {type === "login" ? "Login" : "SignUp"} to FlexiGigs
             </h3>
-            {error && <p className="text-red-500" aria-live="polite">{error}</p>}
+            {error && <p className="text-red-500" aria-live="polite">{error}</p>} {/* Display error message */}
             <div className="flex flex-col gap-5">
-              <input
-                type="text"
-                name="email"
-                placeholder="Email"
-                className="border border-slate-300 p-3 w-80"
-                onChange={handleChange}
-              />
-              <input
-                type="password"
-                placeholder="Password"
-                className="border border-slate-300 p-3 w-80"
-                name="password"
-                onChange={handleChange}
-              />
+              <div className="relative w-full">
+                <input
+                  type="text"
+                  name="email"
+                  placeholder="Email"
+                  className="border border-slate-300 p-3 w-80"
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="relative w-full">
+                <input
+                  type="password"
+                  placeholder="Password"
+                  className="border border-slate-300 p-3 w-80"
+                  name="password"
+                  onChange={handleChange}
+                />
+              </div>
               <button
                 className={`bg-[#1DBF73] text-white px-12 text-lg font-semibold rounded-r-md p-3 w-80 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 onClick={handleClick}
                 type="button"
-                disabled={loading}
+                disabled={loading} // Disable button during loading
               >
                 {loading ? 'Loading...' : 'Continue'}
               </button>
