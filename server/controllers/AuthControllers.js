@@ -3,23 +3,28 @@ import { genSalt, hash, compare } from "bcrypt";
 import jwt from "jsonwebtoken";
 import { renameSync } from "fs";
 
+// Generate password hash
 const generatePassword = async (password) => {
   const salt = await genSalt();
   return await hash(password, salt);
 };
 
-const maxAge = 3 * 24 * 60 * 60;
+// Token expiration time
+const maxAge = 3 * 24 * 60 * 60; // 3 days
+
+// Create JWT token
 const createToken = (email, userId) => {
-  // @ts-ignore
   return jwt.sign({ email, userId }, process.env.JWT_KEY, {
     expiresIn: maxAge,
   });
 };
 
+// Signup function
 export const signup = async (req, res, next) => {
   try {
     const prisma = new PrismaClient();
     const { email, password } = req.body;
+
     if (email && password) {
       const user = await prisma.user.create({
         data: {
@@ -29,7 +34,7 @@ export const signup = async (req, res, next) => {
       });
       return res.status(201).json({
         user: { id: user?.id, email: user?.email },
-        jwt: createToken(email, user.id),
+        jwt: createToken(email, user.id), // Optional: You can keep it if needed
       });
     } else {
       return res.status(400).send("Email and Password Required");
@@ -47,10 +52,12 @@ export const signup = async (req, res, next) => {
   }
 };
 
+// Login function
 export const login = async (req, res, next) => {
   try {
     const prisma = new PrismaClient();
     const { email, password } = req.body;
+
     if (email && password) {
       const user = await prisma.user.findUnique({
         where: {
@@ -66,9 +73,19 @@ export const login = async (req, res, next) => {
         return res.status(400).send("Invalid Password");
       }
 
+      // Create token
+      const token = createToken(email, user.id);
+      
+      // Set token in a cookie
+      res.cookie('jwt', JSON.stringify({ jwt: token }), {
+        httpOnly: true, // Prevent client-side access
+        secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+        sameSite: 'None', // Allow cross-origin requests
+        maxAge: maxAge * 1000, // Max age set to 3 days
+      });
+
       return res.status(200).json({
         user: { id: user?.id, email: user?.email },
-        jwt: createToken(email, user.id),
       });
     } else {
       return res.status(400).send("Email and Password Required");
@@ -78,6 +95,7 @@ export const login = async (req, res, next) => {
   }
 };
 
+// Get user info function
 export const getUserInfo = async (req, res, next) => {
   try {
     if (req?.userId) {
@@ -104,6 +122,7 @@ export const getUserInfo = async (req, res, next) => {
   }
 };
 
+// Set user info function
 export const setUserInfo = async (req, res, next) => {
   try {
     if (req?.userId) {
@@ -144,6 +163,7 @@ export const setUserInfo = async (req, res, next) => {
   }
 };
 
+// Set user image function
 export const setUserImage = async (req, res, next) => {
   try {
     if (req.file) {
@@ -161,7 +181,7 @@ export const setUserImage = async (req, res, next) => {
       }
       return res.status(400).send("Cookie Error.");
     }
-    return res.status(400).send("Image not inclued.");
+    return res.status(400).send("Image not included.");
   } catch (err) {
     console.log(err);
     res.status(500).send("Internal Server Occured");
