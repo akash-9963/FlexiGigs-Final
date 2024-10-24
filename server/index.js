@@ -15,7 +15,7 @@ const port = process.env.PORT;
 
 // CORS configuration
 app.use(cors({
-  origin: 'https://flexigigs.vercel.app', // Your frontend origin
+  origin: 'https://flexi-ruby.vercel.app', // Your frontend origin
   credentials: true, // Allow credentials if needed
   methods: ['GET', 'POST', 'OPTIONS', 'DELETE'], // Allowed methods
   allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
