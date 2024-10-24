@@ -11,15 +11,16 @@ export const verifyToken = (req, res, next) => {
     return res.status(401).send("You are not authenticated!");
   }
 
-  try {
-    // Decode the token without verification
-    const payload = jwt.decode(token);
-    req.userId = payload?.userId; // Set userId on the request object
+  // Verify the token using the secret key
+  jwt.verify(token, process.env.JWT_KEY, (err, payload) => {
+    if (err) {
+      console.log("Token verification error:", err.message);
+      return res.status(403).send("Token is not valid!");
+    }
 
+    // Set userId on the request object
+    req.userId = payload?.userId;
     console.log("Authenticated user ID:", req.userId);
     next();
-  } catch (err) {
-    console.log("Error decoding token:", err.message);
-    return res.status(403).send("Token is not valid!");
-  }
+  });
 };
