@@ -12,10 +12,7 @@ import multer from "multer";
 const authRoutes = Router();
 const upload = multer({ dest: "uploads/profiles/" });
 
-// Handle preflight requests
-authRoutes.options("*", (req, res) => {
-  res.sendStatus(200);
-});
+
 
 // Define your routes
 authRoutes.post("/signup", signup);
