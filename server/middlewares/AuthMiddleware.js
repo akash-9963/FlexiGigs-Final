@@ -1,13 +1,25 @@
 import jwt from "jsonwebtoken";
 
 export const verifyToken = (req, res, next) => {
-  const token = req.cookies.jwt ? JSON.parse(req.cookies.jwt).jwt : null; // Safely handle missing cookies
-  if (!token) return res.status(401).send("You are not authenticated!");
+  // Check if the cookie is present and parse it
+  const token = req.cookies.jwt ? JSON.parse(req.cookies.jwt).jwt : null;
+  console.log("Token:", token); // Log the token for debugging
 
+  if (!token) {
+    console.log("No token found, user not authenticated."); // Log the absence of token
+    return res.status(401).send("You are not authenticated!");
+  }
+
+  // Verify the token using the secret key
   jwt.verify(token, process.env.JWT_KEY, (err, payload) => {
-    if (err) return res.status(403).send("Token is not valid!");
+    if (err) {
+      console.log("Token verification error:", err.message); // Log any verification errors
+      return res.status(403).send("Token is not valid!");
+    }
 
-    req.userId = payload?.userId; // Set userId on the request
+    // Set userId on the request object
+    req.userId = payload?.userId;
+    console.log("Authenticated user ID:", req.userId); // Log the authenticated user ID
     next();
   });
 };
