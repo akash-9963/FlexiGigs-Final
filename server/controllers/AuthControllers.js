@@ -19,6 +19,18 @@ const createToken = (email, userId) => {
   });
 };
 
+// Middleware to verify token
+const verifyToken = (req, res, next) => {
+  const token = req.cookies.jwt ? JSON.parse(req.cookies.jwt).jwt : null;
+  if (!token) return res.status(401).send("You are not authenticated!");
+
+  jwt.verify(token, process.env.JWT_KEY, (err, payload) => {
+    if (err) return res.status(403).send("Token is not valid!");
+    req.userId = payload?.userId; // Set userId on the request
+    next();
+  });
+};
+
 // Signup function
 export const signup = async (req, res, next) => {
   try {
@@ -97,8 +109,8 @@ export const login = async (req, res, next) => {
 
 // Get user info function
 export const getUserInfo = async (req, res, next) => {
-  try {
-    if (req?.userId) {
+  verifyToken(req, res, async () => {
+    try {
       const prisma = new PrismaClient();
       const user = await prisma.user.findUnique({
         where: {
@@ -116,16 +128,16 @@ export const getUserInfo = async (req, res, next) => {
           isProfileSet: user?.isProfileInfoSet,
         },
       });
+    } catch (err) {
+      res.status(500).send("Internal Server Occured");
     }
-  } catch (err) {
-    res.status(500).send("Internal Server Occured");
-  }
+  });
 };
 
 // Set user info function
 export const setUserInfo = async (req, res, next) => {
-  try {
-    if (req?.userId) {
+  verifyToken(req, res, async () => {
+    try {
       const { userName, fullName, description } = req.body;
       if (userName && fullName && description) {
         const prisma = new PrismaClient();
@@ -150,24 +162,24 @@ export const setUserInfo = async (req, res, next) => {
           .status(400)
           .send("Username, Full Name and description should be included.");
       }
-    }
-  } catch (err) {
-    if (err instanceof Prisma.PrismaClientKnownRequestError) {
-      if (err.code === "P2002") {
-        return res.status(400).json({ userNameError: true });
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        if (err.code === "P2002") {
+          return res.status(400).json({ userNameError: true });
+        }
+      } else {
+        return res.status(500).send("Internal Server Error");
       }
-    } else {
-      return res.status(500).send("Internal Server Error");
+      throw err;
     }
-    throw err;
-  }
+  });
 };
 
 // Set user image function
 export const setUserImage = async (req, res, next) => {
-  try {
-    if (req.file) {
-      if (req?.userId) {
+  verifyToken(req, res, async () => {
+    try {
+      if (req.file) {
         const date = Date.now();
         let fileName = "uploads/profiles/" + date + req.file.originalname;
         renameSync(req.file.path, fileName);
@@ -179,11 +191,10 @@ export const setUserImage = async (req, res, next) => {
         });
         return res.status(200).json({ img: fileName });
       }
-      return res.status(400).send("Cookie Error.");
+      return res.status(400).send("Image not included.");
+    } catch (err) {
+      console.log(err);
+      res.status(500).send("Internal Server Occured");
     }
-    return res.status(400).send("Image not included.");
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Internal Server Occured");
-  }
+  });
 };
