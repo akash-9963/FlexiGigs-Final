@@ -78,6 +78,10 @@ function AuthWrapper({ type }) {
     }
   };
 
+  const closeModal = () => {
+    dispatch({ type: reducerCases.CLOSE_AUTH_MODAL });
+  };
+
   useEffect(() => {
     const html = document.querySelector("html");
     html.style.overflowY = "hidden";
@@ -92,6 +96,13 @@ function AuthWrapper({ type }) {
       <div className="h-[100vh] w-[100vw] backdrop-blur-md fixed top-0" id="blur-div"></div>
       <div className="h-[100vh] w-[100vw] flex flex-col justify-center items-center">
         <div className="fixed z-[101] h-max w-max bg-white flex flex-col justify-center items-center" id="auth-modal">
+          <button
+            className="absolute top-4 right-4 text-gray-500"
+            onClick={closeModal}
+            aria-label="Close"
+          >
+            &times; {/* Close button symbol */}
+          </button>
           <div className="flex flex-col justify-center items-center p-8 gap-7">
             <h3 className="text-2xl font-semibold text-slate-700">
               {type === "login" ? "Login" : "SignUp"} to FlexiGigs
