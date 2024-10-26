@@ -79,14 +79,27 @@ function AuthWrapper({ type }) {
     };
   }, [dispatch, showLoginModal, showSignupModal]);
 
+  const closeModal = () => {
+    dispatch({ type: reducerCases.CLOSE_AUTH_MODAL });
+  };
+
+  const toggleAuthType = () => {
+    if (type === "login") {
+      dispatch({ type: reducerCases.OPEN_SIGNUP_MODAL });
+    } else {
+      dispatch({ type: reducerCases.OPEN_LOGIN_MODAL });
+    }
+  };
+
   return (
     <div className="fixed top-0 z-[100]">
       <div className="h-[100vh] w-[100vw] backdrop-blur-md fixed top-0" id="blur-div"></div>
       <div className="h-[100vh] w-[100vw] flex flex-col justify-center items-center">
         <div className="fixed z-[101] h-max w-max bg-white flex flex-col justify-center items-center" id="auth-modal">
+          <button onClick={closeModal} className="absolute top-2 right-2 text-gray-500">X</button>
           <div className="flex flex-col justify-center items-center p-8 gap-7">
             <h3 className="text-2xl font-semibold text-slate-700">
-              {type === "login" ? "Login" : "SignUp"} to FlexiGigs
+              {type === "login" ? "Login" : "Sign Up"} to FlexiGigs
             </h3>
             {error && <p className="text-red-500" aria-live="polite">{error}</p>}
             <div className="flex flex-col gap-5">
@@ -113,6 +126,15 @@ function AuthWrapper({ type }) {
                 {loading ? 'Loading...' : 'Continue'}
               </button>
             </div>
+            <p className="mt-4">
+              {type === "login" ? "Don't have an account? " : "Already have an account? "}
+              <span
+                onClick={toggleAuthType}
+                className="text-[#1DBF73] cursor-pointer"
+              >
+                {type === "login" ? "Sign Up" : "Log In"}
+              </span>
+            </p>
           </div>
         </div>
       </div>
