@@ -8,30 +8,25 @@ import { orderRoutes } from "./routes/OrderRoutes.js";
 import { messageRoutes } from "./routes/MessageRoutes.js";
 import { dashboardRoutes } from "./routes/DashboardRoutes.js";
 
-// Load environment variables from .env file
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 5000; // Default to port 5000 if not specified
+const port = process.env.PORT || 5000;
 
 // CORS configuration
 const corsOptions = {
-  origin: "https://flexigigs.vercel.app", // Your frontend origin
-  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
-  methods: ['GET', 'POST', 'OPTIONS', 'DELETE', 'PUT'], // Allowed methods
-  allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+  origin: process.env.ORIGIN, // Use environment variable for origin
+  credentials: true, // Allow credentials
+  methods: ['GET', 'POST', 'OPTIONS', 'DELETE', 'PUT'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 };
 
 // Use CORS middleware
 app.use(cors(corsOptions));
-
-// Handle preflight requests for all routes
-app.options("*", cors(corsOptions)); // Automatically handle preflight requests
+app.options("*", cors(corsOptions));
 
 // Middleware to parse cookies
 app.use(cookieParser());
-
-// Middleware to parse JSON request bodies
 app.use(express.json());
 
 // Serve static files from the uploads directory

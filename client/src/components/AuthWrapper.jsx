@@ -13,7 +13,7 @@ function AuthWrapper({ type }) {
 
   const [values, setValues] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false); // Loading state
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (cookies.jwt) {
@@ -27,18 +27,16 @@ function AuthWrapper({ type }) {
   };
 
   const isValidEmail = (email) => {
-    // Basic email validation regex
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
   };
 
   const handleClick = async (e) => {
-    e.preventDefault(); // Prevent default form submission
+    e.preventDefault();
 
     const { email, password } = values;
-    setError(""); // Reset error state
+    setError("");
 
-    // Validate input
     if (!email || !password) {
       setError("Email and Password are required.");
       return;
@@ -48,17 +46,16 @@ function AuthWrapper({ type }) {
       return;
     }
 
-    setLoading(true); // Set loading state
+    setLoading(true);
     try {
-      const {
-        data: { user, jwt },
-      } = await axios.post(
+      const response = await axios.post(
         type === "login" ? LOGIN_ROUTE : SIGNUP_ROUTE,
         { email, password },
-        { withCredentials: true }
+        { withCredentials: true } // Ensure credentials are sent
       );
 
-      setCookies("jwt", { jwt }); // Set cookie
+      const { user, jwt } = response.data;
+      setCookies("jwt", { jwt });
       dispatch({ type: reducerCases.CLOSE_AUTH_MODAL });
 
       if (user) {
@@ -66,11 +63,10 @@ function AuthWrapper({ type }) {
         window.location.reload();
       }
     } catch (err) {
-      // Set specific error messages based on the response from the server
       const message = err.response?.data?.message || "An error occurred. Please try again.";
       setError(message);
     } finally {
-      setLoading(false); // Reset loading state
+      setLoading(false);
     }
   };
 
@@ -92,66 +88,31 @@ function AuthWrapper({ type }) {
             <h3 className="text-2xl font-semibold text-slate-700">
               {type === "login" ? "Login" : "SignUp"} to FlexiGigs
             </h3>
-            {error && <p className="text-red-500" aria-live="polite">{error}</p>} {/* Display error message */}
+            {error && <p className="text-red-500" aria-live="polite">{error}</p>}
             <div className="flex flex-col gap-5">
-              <div className="relative w-full">
-                <input
-                  type="text"
-                  name="email"
-                  placeholder="Email"
-                  className="border border-slate-300 p-3 w-80"
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="relative w-full">
-                <input
-                  type="password"
-                  placeholder="Password"
-                  className="border border-slate-300 p-3 w-80"
-                  name="password"
-                  onChange={handleChange}
-                />
-              </div>
+              <input
+                type="text"
+                name="email"
+                placeholder="Email"
+                className="border border-slate-300 p-3 w-80"
+                onChange={handleChange}
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                className="border border-slate-300 p-3 w-80"
+                name="password"
+                onChange={handleChange}
+              />
               <button
                 className={`bg-[#1DBF73] text-white px-12 text-lg font-semibold rounded-r-md p-3 w-80 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 onClick={handleClick}
                 type="button"
-                disabled={loading} // Disable button during loading
+                disabled={loading}
               >
                 {loading ? 'Loading...' : 'Continue'}
               </button>
             </div>
-          </div>
-          <div className="py-5 w-full flex items-center justify-center border-t border-slate-400">
-            <span className="text-sm text-slate-700">
-              {type === "login" ? (
-                <>
-                  Not a member yet?&nbsp;
-                  <span
-                    className="text-[#1DBF73] cursor-pointer"
-                    onClick={() => {
-                      dispatch({ type: reducerCases.TOGGLE_SIGNUP_MODAL, showSignupModal: true });
-                      dispatch({ type: reducerCases.TOGGLE_LOGIN_MODAL, showLoginModal: false });
-                    }}
-                  >
-                    Join Now
-                  </span>
-                </>
-              ) : (
-                <>
-                  Already a member?&nbsp;
-                  <span
-                    className="text-[#1DBF73] cursor-pointer"
-                    onClick={() => {
-                      dispatch({ type: reducerCases.TOGGLE_SIGNUP_MODAL, showSignupModal: false });
-                      dispatch({ type: reducerCases.TOGGLE_LOGIN_MODAL, showLoginModal: true });
-                    }}
-                  >
-                    Login Now
-                  </span>
-                </>
-              )}
-            </span>
           </div>
         </div>
       </div>
