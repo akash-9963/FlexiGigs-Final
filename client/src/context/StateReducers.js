@@ -20,12 +20,14 @@ const reducer = (state, action) => {
     case reducerCases.TOGGLE_LOGIN_MODAL:
       return {
         ...state,
-        showLoginModal: action.showLoginModal,
+        showLoginModal: true,
+        showSignupModal: false, // Ensure signup modal is closed
       };
     case reducerCases.TOGGLE_SIGNUP_MODAL:
       return {
         ...state,
-        showSignupModal: action.showSignupModal,
+        showSignupModal: true,
+        showLoginModal: false, // Ensure login modal is closed
       };
     case reducerCases.CLOSE_AUTH_MODAL:
       return {
@@ -43,7 +45,6 @@ const reducer = (state, action) => {
         ...state,
         gigData: action.gigData,
       };
-
     case reducerCases.HAS_USER_ORDERED_GIG:
       return {
         ...state,
