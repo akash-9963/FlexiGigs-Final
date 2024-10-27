@@ -13,6 +13,10 @@ export default function CheckoutForm() {
   const [message, setMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Determine the correct return URL based on the environment
+  const isLocal = window.location.hostname === "localhost";
+  const returnUrl = isLocal ? "http://localhost:3000/success" : "https://flexigigs.vercel.app/success";
+
   useEffect(() => {
     if (!stripe) return;
 
@@ -64,7 +68,7 @@ export default function CheckoutForm() {
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: "http://localhost:3000/success",
+        return_url: returnUrl, // Use the appropriate return URL
       },
     });
 
