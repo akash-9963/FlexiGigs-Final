@@ -23,6 +23,8 @@ export default function CheckoutForm() {
     if (!clientSecret) return;
 
     stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
+      console.log("Payment Intent Status:", paymentIntent.status); // Log to console
+
       switch (paymentIntent.status) {
         case "succeeded":
           setMessage({ text: "Payment succeeded!", type: "success" });
@@ -71,6 +73,9 @@ export default function CheckoutForm() {
         text: error.type === "card_error" || error.type === "validation_error" ? error.message : "An unexpected error occurred.",
         type: "error",
       });
+    } else {
+      // Log a success message if payment is confirmed
+      console.log("Payment confirmed successfully.");
     }
 
     setIsLoading(false);
