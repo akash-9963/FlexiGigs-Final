@@ -15,7 +15,7 @@ const port = process.env.PORT || 5000;
 
 // CORS configuration
 const corsOptions = {
-  origin: process.env.ORIGIN, // Use environment variable for origin
+  origin: 'https://flexigigs.vercel.app', // Use environment variable for origin
   credentials: true, // Allow credentials
   methods: ['GET', 'POST', 'OPTIONS', 'DELETE', 'PUT'],
   allowedHeaders: ['Content-Type', 'Authorization'],
